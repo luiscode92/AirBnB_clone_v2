@@ -11,7 +11,14 @@ class FileStorage:
     def all(self, cls=None):
         """returns a dictionary
         """
-        return self.__objects
+        if cls:
+            obj_dic = {}
+            for key, val in self.__objects.items():
+                if cls.__name__ == val.__class__.__name__:
+                    obj_dic[key] = val
+            return obj_dic
+        else:
+            return self.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
