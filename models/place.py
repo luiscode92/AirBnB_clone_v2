@@ -1,30 +1,18 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-from models.base_model import BaseModel, Base
-from models.city import City
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+""" Place Module for HBNB project """
+from models.base_model import BaseModel
 
 
-class State(BaseModel, Base):
-    """ State class """
-    __tablename__ = 'states'
-
-    name = Column(
-        String(128),
-        nullable=False
-    )
-
-    cities = relationship("City", backref="state", cascade="all, delete")
-
-    @property
-    def cities(self):
-        """ cities getter """
-        from models import storage
-
-        all_cts = storage.all(City)
-        sts_cts = []
-        for city in all_cts.values():
-            if self.id == city.state_id:
-                sts_cts.append(city)
-        return sts_cts
+class Place(BaseModel):
+    """ A place to stay """
+    city_id = ""
+    user_id = ""
+    name = ""
+    description = ""
+    number_rooms = 0
+    number_bathrooms = 0
+    max_guest = 0
+    price_by_night = 0
+    latitude = 0.0
+    longitude = 0.0
+    amenity_ids = []
