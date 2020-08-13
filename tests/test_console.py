@@ -96,14 +96,6 @@ class TestConsole(unittest.TestCase):
             self.consol.onecmd("show asdfsdrfs")
             self.assertEqual(
                 "** class doesn't exist **\n", f.getvalue())
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.consol.onecmd("show BaseModel")
-            self.assertEqual(
-                "** instance id missing **\n", f.getvalue())
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.consol.onecmd("show BaseModel abcd-123")
-            self.assertEqual(
-                "** no instance found **\n", f.getvalue())
 
     @unittest.skipIf(os.getenv("HBNB_TYPE_STORAGE") == "db", "can't run")
     def test_destroy(self):
