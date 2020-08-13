@@ -7,6 +7,24 @@ from sqlalchemy.orm import relationship
 from os import getenv
 
 
+place_amenity = Table(
+    'place_amenity',
+    Base.metadata,
+    Column(
+        'place_id',
+        String(60),
+        ForeignKey('places.id'),
+        primary_key=True,
+        nullable=False),
+    Column(
+        'amenity_id',
+        String(60),
+        ForeignKey('amenities.id'),
+        primary_key=True,
+        nullable=False)
+)
+
+
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = 'places'
@@ -25,14 +43,36 @@ class Place(BaseModel, Base):
         reviews = relationship('Review', backref='place',
                                cascade='all, delete-orphan')
 
+        amenities = relationship(
+            'Amenity', secondary=place_amenity,
+            viewonly=False)
+
     else:
         @property
         def reviews(self):
             """
-            Getter that return list of Review instances 
+            Getter that return list of Review instances
             """
             list_reviews = []
             for review in self.reviews:
                 if self.id == review.place_id:
                     list_reviews.append(review)
             return list_reviews
+
+        @property
+        def amenities(self):
+            """
+            getter amenity that returns the list of Amenity
+            """
+            new_list = []
+            for obj in amenity_ids:
+                if obj.id == self.id:
+                    new_list.append(obj)
+
+            return new_list
+
+        @amenities.setter
+        def amenities(self, obj):
+            """ Adds an Amenity.id to the attribute amenity_ids """
+            if type(obj).__name__ == 'Amenity':
+                self.amenity_ids.append(obj)
