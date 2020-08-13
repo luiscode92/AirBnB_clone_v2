@@ -22,7 +22,8 @@ class FileStorage:
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        self.all().update(
+            {obj.to_dict()['__class__'] + '.' + str(obj.id): obj})
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -60,11 +61,7 @@ class FileStorage:
     def delete(self, obj=None):
         """delete an object if it exists
         """
-
-        try:
-            if obj:
-                key = "{}.{}".format(type(obj).__name__, obj.id)
-                if key in self.__objects:
-                    del self.__objects[key]
-        except:
-            pass
+        if obj:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]

@@ -65,12 +65,6 @@ class TestConsole(unittest.TestCase):
             self.consol.onecmd("\n")
             self.assertEqual('', f.getvalue())
 
-    def test_quit(self):
-        """test quit command inpout"""
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.consol.onecmd("quit")
-            self.assertEqual('', f.getvalue())
-
     @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db', 'file')
     def test_create(self):
         """Test create command inpout"""
@@ -87,7 +81,7 @@ class TestConsole(unittest.TestCase):
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("all User")
             self.assertEqual(
-                "[[User]", f.getvalue()[:7])
+                "[\"[User]", f.getvalue()[:8])
 
     @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db', 'db')
     def test_create_file(self):
