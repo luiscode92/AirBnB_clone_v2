@@ -1,84 +1,54 @@
 #!/usr/bin/python3
-""" script that creates and distributes an archive """
+"""
+Write a Fabric script (based on the file 2-do_deploy_web_static.py) that
+creates and distributes an archive to your web servers, using the function
+deploy
+"""
 
-
-from fabric.api import run, env, put, local
+from fabric.api import *
 from datetime import datetime
-from os.path import exists
-import re
+from os.path import isfile
 
-env.hosts = ['54.90.192.199', '34.73.198.19']
-
-dt = datetime.now()
+env.user = 'ubuntu'
+env.hosts = ['35.196.114.247', '34.73.220.28']
 
 
 def do_pack():
-    """ Packs web_static files """
-    fl_name = 'versions/web_static_{}{}{}{}{}{}.tgz'.format(
-        dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
-    )
+    """ Generate a .tgz archive from the contents of the web_static folder """
+    time = datetime.now()
+    name = 'web_static_' + str(time.year) + str(time.month) + str(time.day)
+    name = name + str(time.hour) + str(time.minute) + str(time.second) + '.tgz'
     local('mkdir -p versions')
-    cmd = local('tar -cvzf {} web_static'.format(fl_name))
-
-    return fl_name if cmd.succeeded else None
+    archive = local('tar -cvzf versions/{} web_static'.format(name))
+    if archive.failed:
+        return None
+    return 'versions/{}'.format(name)
 
 
 def do_deploy(archive_path):
-    """ Deploys archive """
-    if exists(archive_path) is False:
+    """ Distribute an archive to the web servers """
+    if not isfile(archive_path):
         return False
-
-    arch_name = re.split('[/.]', archive_path)[1]
-    direc = '/data/web_static/releases'
-
-    stat = True
-
-    upload = put(archive_path, '/tmp/{}.tgz'.format(arch_name))
-    if upload.failed:
-        stat = False
-
-    di = run(
-        'sudo mkdir -p {}/{}/'.format(direc, arch_name))
-    if di.failed:
-        stat = False
-
-    unp = run(
-        'sudo tar -xzf /tmp/{}.tgz -C {}/{}/'
-        .format(arch_name, direc, arch_name))
-    if unp.failed:
-        stat = False
-
-    rem = run('sudo rm /tmp/{}.tgz'.format(arch_name))
-    if rem.failed:
-        stat = False
-
-    mov = run(
-        'sudo mv {}/{}/web_static/* {}/{}/'
-        .format(direc, arch_name, direc, arch_name))
-    if mov.failed:
-        stat = False
-
-    ren = run(
-        'sudo rm -rf {}/{}/web_static'.format(direc, arch_name))
-    if ren.failed:
-        stat = False
-
-    rep = run('sudo rm -rf /data/web_static/current')
-    if rep.failed:
-        stat = False
-
-    lin = run(
-        'sudo ln -s {}/{}/ /data/web_static/current'
-        .format(direc, arch_name))
-    if lin.failed:
-        stat = False
-
-    return stat
+    put(archive_path, '/tmp/')
+    archive = archive_path.replace('.tgz', '')
+    archive = archive.replace('versions/', '')
+    run('mkdir -p /data/web_static/releases/{}/'.format(archive))
+    run('tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/'
+        .format(archive, archive))
+    run('rm /tmp/{}.tgz'.format(archive))
+    run('mv /data/web_static/releases/{}/web_static/* '.format(archive) +
+        '/data/web_static/releases/{}/'.format(archive))
+    run('rm -rf /data/web_static/releases/{}/web_static'.format(archive))
+    run('rm -rf /data/web_static/current')
+    run('ln -s /data/web_static/releases/{}/ /data/web_static/current'
+        .format(archive))
+    print('New version deployed!')
+    return True
 
 
 def deploy():
-    """ distributes an archive to your web servers """
-    file_path = do_pack()
-    if file_path is None:
+    """ Create and distribute an archive to the web servers """
+    archive_path = do_pack()
+    if archive_path is None:
         return False
-    return do_deploy(file_path)
+    return do_deploy(archive_path)
