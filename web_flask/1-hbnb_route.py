@@ -1,4 +1,4 @@
-#!/usr/binin/python3
+#!/usr/bin/python3
 """
 start a flask web application
 """
