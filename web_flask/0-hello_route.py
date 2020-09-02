@@ -1,6 +1,6 @@
-#!/usr/bin/pyhton3
+#!/usr/bin/python3
 """
-script that strat a flask web app
+Start a Flask web application
 """
 from flask import Flask
 app = Flask(__name__)
@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
-    """print massage"""
+    """ Print a message """
     return 'Hello HBNB!'
 
 if __name__ == '__main__':
