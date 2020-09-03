@@ -28,7 +28,7 @@ def c(text):
 @app.route('/python/<text>', strict_slashes=False)
 def python(text='is cool'):
     """ Print python <text> """
-    return 'python {}'.format(text).replace('_', ' ')
+    return 'Python {}'.format(text).replace('_', ' ')
 
 
 if __name__ == '__main__':
