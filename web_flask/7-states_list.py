@@ -1,11 +1,11 @@
-#/usr/bin/python3
+#!/usr/bin/python3
 """
 Start a Flask web appication
 """
 from flask import Flask, render_template
 from models import storage
 from models.state import State
-app = Flask(__name__, template_folder='tem plates')
+app = Flask(__name__, template_folder='templates')
 
 
 @app.route('/state_list', strict_slashes=False)
